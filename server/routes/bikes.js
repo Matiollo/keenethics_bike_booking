@@ -58,41 +58,19 @@ router.delete('/:id', getBike, async (req, res) => {
     }
 })
 
-// Getting number of bicycles
-router.get('/count', async (req, res) => {
+// Getting statistics
+router.get('/stats', async (req, res) => {
     try {
-        const count = await Bike.countDocuments()
-        res.json({ count: count })
-    } catch (err) {
-        res.status(500).json({ message: err.message })
-    }
-})
-
-// Getting number of available bicycles
-router.get('/count/available', async (req, res) => {
-    try {
-        const count = await Bike.countDocuments({ availability: "available" })
-        res.json({ count: count })
-    } catch (err) {
-        res.status(500).json({ message: err.message })
-    }
-})
-
-// Getting number of booked bicycles
-router.get('/count/busy', async (req, res) => {
-    try {
-        const count = await Bike.countDocuments({ availability: "busy" })
-        res.json({ count: count })
-    } catch (err) {
-        res.status(500).json({ message: err.message })
-    }
-})
-
-// Getting an average price of a bicycle
-router.get('/average_price', async (req, res) => {
-    try {
+        const count_all = await Bike.countDocuments()
+        const count_available = await Bike.countDocuments({ availability: "available" })
+        const count_busy = await Bike.countDocuments({ availability: "busy" })
         const averagePrice = await Bike.aggregate([{ $group: { _id: null, averagePrice: { $avg: "$price" } } }])
-        res.json({ averagePrice: averagePrice[0].averagePrice.toFixed(2) })
+        res.json({ 
+            count_all: count_all,
+            count_available: count_available,
+            count_busy: count_busy,
+            averagePrice: averagePrice[0].averagePrice.toFixed(2)
+        })
     } catch (err) {
         res.status(500).json({ message: err.message })
     }
